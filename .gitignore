@@ -1,0 +1,27 @@
+# Exclude specific files
+splus_halpha_report.pdf
+
+# Include specific files and directories
+!Ha-emitters/
+!Ha-emitters/Halpha_Mine_PerField_total.csv
+!Ha-emitters/Halpha_Mine_PerField_total_simbad.csv
+
+!Ha-emitters-disk/
+!Ha-emitters-disk/Halpha-disk_splus_Mine_PerField_total.csv
+!Ha-emitters-disk/Halpha-disk_splus_Mine_PerField_total_vphas.csv
+!Ha-emitters-disk/Halpha-disk_splus_Mine_PerField_total_wise.csv
+!Ha-emitters-disk/Halpha-disk_splus_Mine_PerField_total_simbad.csv
+
+# Exclude files with certain extensions
+*.csv
+*.fits
+*.dat
+*.zip
+*.ecsv
+
+# Exclude files with certain suffixes or patterns
+*~
+*#
+#*
+programs/.#splus_vphas.py
+notebooks/.ipynb_checkpoints/ploblematic-disk-fields-checkpoint.ipynb
