@@ -1,0 +1,99 @@
+#+TITLE: Mapping Halpha extended sources using SPLUS data
+#+AUTHOR: Luis A. Gutiérrez Soto
+#+DATE: <2025-03-31 viernes>
+#+STARTUP: overview
+
+* Propiedades del proyecto
+:PROPERTIES:
+:ID:         Extended_Halpha
+:END:
+
+* Objetivos clave
+** Principal
+  1. Seleccionar objetos extensos con líneas de emisión usando SPLUS.
+  2. Debemos crear un algoritmo para sleccionar este tipos de objetos. Estoy pensando extender la
+     metología presentada en [[https://ui.adsabs.harvard.edu/abs/2025A%26A...695A.104G/abstract][Gutiérres-Soto et al.]], pero no sé si tiene mucho sentido
+     por este melología es para seleccionar fuentes puntuales. La otra opción sería adaptar 
+     la metodología de [[https://ui.adsabs.harvard.edu/abs/2022A%26A...668A..60L/abstract][Lumbrearas-Calle et al.]], el cual fue diseñado para identificar
+     [O III] emitters en el universo local usando J-PLUS. O una combinación de ambos.
+  3. Mi idea es poder seleccionar Halpha extended objets como PNe extendidas, regiones HII (SPLUS observó
+     una pequeña área del disco), galaxias con botes de formación estelar y más.
+     
+** Secundarios
+  1. Publicar en A&A o ApJ?
+  2. Crear un catálogo público de objetos extendidos con líneas de emisión.
+
+** Notes
+  + A paper lead by [[https://iopscience.iop.org/article/10.3847/1538-3881/adb485/pdf][Dijeau]] et al. that present a catlogo of Emission line Nebulae using SDSS photometry
+    and emove artifacts by crossmatching with DESI Legacy Imaging Survey (LS) data.
+
+* Metología
+** Descargar datos de SPLUS.CLOUD.
+
+ Idea de query para descargar las galaxias:
+
+ #+BEGIN_SRC query :
+ SELECT 
+    Field, ID, ID_RA, ID_DEC, 
+    CLASS_STAR_r, CLASS_STAR_i, 
+    FWHM_n_r, FWHM_n_i, 
+    FLUX_RADIUS_50, ELONGATION, ELLIPTICITY,
+    r_PStotal, e_r_PStotal, 
+    j0660_PStotal, e_j0660_PStotal, 
+    i_PStotal, e_i_PStotal,
+    EBV_SCH, SEX_FLAGS_DET,
+    CASE 
+        WHEN r_PStotal BETWEEN 16.0 AND 17.5 THEN 'Bin1'
+        WHEN r_PStotal BETWEEN 17.5 AND 19.0 THEN 'Bin2'
+        WHEN r_PStotal BETWEEN 19.0 AND 20.5 THEN 'Bin3'
+        ELSE 'Bin4'
+    END AS mag_bin
+FROM 
+    idr5_dual
+WHERE 
+    CLASS_STAR_r < 0.2 
+    AND CLASS_STAR_i < 0.2 
+    AND FWHM_n_r > 1.5 
+    AND FWHM_n_i > 1.5 
+    AND FLUX_RADIUS_50 > 2.0 
+    AND ELONGATION < 2.0 
+    AND e_r_PStotal <= 0.3 
+    AND e_j0660_PStotal <= 0.3 
+    AND e_i_PStotal <= 0.3 
+    AND s2n_r_PStotal > 3 
+    AND s2n_J0660_PStotal > 3 
+    AND s2n_i_PStotal > 3 
+    AND SEX_FLAGS_DET <= 4 
+    AND EBV_SCH < 0.3
+#+END_SRC
+
+#+BEGIN_SRC query :
+SELECT 
+    Field, ID, ID_RA, ID_DEC,
+    -- Fotometría AUTO (recomendada para galaxias)
+    AUTO_r, e_AUTO_r, AUTO_j0660, e_AUTO_j0660, AUTO_i, e_AUTO_i,
+    -- Fotometría PETRO (alternativa)
+    PETRO_r, e_PETRO_r, PETRO_j0660, e_PETRO_j0660, PETRO_i, e_PETRO_i,
+    -- Parámetros morfológicos
+    FLUX_RADIUS_50, ELONGATION, ELLIPTICITY, FWHM_n_r, FWHM_n_i,
+    -- Bins de magnitud ajustados
+    CASE 
+        WHEN AUTO_r BETWEEN 16.0 AND 18.0 THEN 'Bin1'
+        WHEN AUTO_r BETWEEN 18.0 AND 20.0 THEN 'Bin2'
+        WHEN AUTO_r BETWEEN 20.0 AND 21.5 THEN 'Bin3'
+        ELSE 'Bin4'
+    END AS mag_bin
+FROM 
+    idr5_dual
+WHERE 
+    CLASS_STAR_r < 0.2 
+    AND FWHM_n_r > 1.5 
+    AND FLUX_RADIUS_50 > 2.0 
+    AND ELONGATION < 2.0 
+    AND e_AUTO_r <= 0.3 
+    AND e_AUTO_j0660 <= 0.3 
+    AND e_AUTO_i <= 0.3 
+    AND SEX_FLAGS_DET <= 4 
+    AND EBV_SCH < 0.3
+
+#+END_SRC
