@@ -26,7 +26,8 @@
 ** Notes
   + A paper lead by [[https://iopscience.iop.org/article/10.3847/1538-3881/adb485/pdf][Dijeau]] et al. that present a catlogo of Emission line Nebulae using SDSS photometry
     and emove artifacts by crossmatching with DESI Legacy Imaging Survey (LS) data.
-
+  + Other paper lead by [[https://ui.adsabs.harvard.edu/abs/2025AJ....169..174C/abstract][Chen et al.]] about of a Catalog of Emission-line Nebulae, Star Clusters, 
+    and Supergiants in M31 from the LAMOST Spectroscopic Survey. 
 * Metología
 ** Descargar datos de SPLUS.CLOUD.
 
@@ -64,7 +65,7 @@ WHERE
     AND s2n_J0660_PStotal > 3 
     AND s2n_i_PStotal > 3 
     AND SEX_FLAGS_DET <= 4 
-    AND EBV_SCH < 0.3
+    AND EBV_SCH < 0.3         
 #+END_SRC
 
 #+BEGIN_SRC query :
